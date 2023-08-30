@@ -1,0 +1,75 @@
+### Top level .gitignore
+
+# Includes any shared ignore settings
+
+## Miscellaneous
+
+.history/
+.DS_Store
+
+## IDE specific settings
+
+.vscode/
+!extensions/vscode*/.vscode
+.vscode-test/
+*.code-workspace
+*.swp
+*.vsix
+
+## Code Coverage
+
+coverage/
+htmlcov/
+.coverage
+
+## Dumps
+
+*.rdb
+*.sqlite3
+
+## Build Output
+
+build/
+dist/
+out/
+dump.rdb
+*.ipynb_checkpoints/
+
+## fine_tuning
+fine_tuning/fine_tuning_repos/*
+fine_tuning/fine_tuning_datasets/*
+fine_tuning/data/*
+fine_tuning/wandb/
+
+## Milvus
+milvus/volumes
+
+## Python
+
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+*.ipynb_checkpoints/
+env/
+venv/
+*.py[cdio]
+*.venv
+.env*
+
+## NodeJS
+
+# dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+## Proto
+
+# ignore any generated proto output
+*.pb*.go
+*_pb*.py
