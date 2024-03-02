@@ -1,0 +1,27 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations:
+    meta.helm.sh/release-name: kube-prometheus-stack-1704865205
+    meta.helm.sh/release-namespace: prometheus
+  labels:
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: kube-prometheus-stack-1704865205
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/part-of: kube-state-metrics
+    app.kubernetes.io/version: 2.10.1
+    helm.sh/chart: kube-state-metrics-5.15.3
+    release: kube-prometheus-stack-1704865205
+  name: kube-prometheus-stack-1704865205-huggingface-tgi-metrics
+  namespace: prometheus
+spec:
+  endpoints:
+  - honorLabels: true
+    port: http
+  namespaceSelector:
+    matchNames:
+    - default
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: huggingface-model
