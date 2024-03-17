@@ -43,22 +43,13 @@ project-root/
     └── requirements.txt
 ```
 
-```bash
-./launch.sh \
---model-id meta-llama/Llama-2-7b-chat-hf \
---num-shard 1 \
---max-concurrent-requests 4 \
---max-input-length 4000 \
---max-total-tokens 4096 \
---max-batch-prefill-tokens 4096
-```
-
 ### Test the Huggingface TGI Server from the command line
+```
 curl localhost:8080/generate \
     -X POST \
     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":20}}' \
     -H 'Content-Type: application/json'
-
+```
 ### Test the Huggingface TGI Server from inside the Fast API container
 ```
 docker ps | grep fastapi
@@ -67,6 +58,7 @@ docker exec -it <fastapi_container_id> /bin/bash
 
 docker exec -it $(docker ps | grep 'fastapi' | awk '{print $1}') /bin/bash
 ```
+
 ```
 curl http://tgi:80/generate \
     -X POST \
@@ -75,11 +67,24 @@ curl http://tgi:80/generate \
 ```
 
 ### Test the Fast API from local terminal
+```
 curl -X 'POST' \
   'http://localhost:8000/generate-text/' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{"prompt": "What is Machine Learning?"}'
+```
+
+
+```bash
+./launch.sh \
+--model-id meta-llama/Llama-2-7b-chat-hf \
+--num-shard 1 \
+--max-concurrent-requests 4 \
+--max-input-length 4000 \
+--max-total-tokens 4096 \
+--max-batch-prefill-tokens 4096
+
 
 <label @FLUENT_LOG>
   <match *.**>
@@ -101,3 +106,4 @@ curl -X 'POST' \
     </store>
   </match>
 </label>
+```
