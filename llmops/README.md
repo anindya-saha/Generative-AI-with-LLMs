@@ -56,6 +56,7 @@ docker ps | grep fastapi
 
 docker exec -it <fastapi_container_id> /bin/bash
 
+docker exec -it $(docker ps | grep 'fluentd' | awk '{print $1}') /bin/bash
 docker exec -it $(docker ps | grep 'fastapi' | awk '{print $1}') /bin/bash
 ```
 
@@ -106,4 +107,57 @@ curl -X 'POST' \
     </store>
   </match>
 </label>
+```
+
+```
+# Start with the official Fluentd image
+FROM fluent/fluentd:v1.12-debian-1
+
+# Update and install dependencies for Ruby upgrade
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        git \
+        curl \
+        build-essential \
+        ruby-dev \
+        make \
+        nodejs \
+        npm \
+        autoconf \
+        bison \
+        libssl-dev \
+        libyaml-dev \
+        libreadline6-dev \
+        zlib1g-dev \
+        libncurses5-dev \
+        libffi-dev \
+        libgdbm6 \
+        libgdbm-dev \
+        libdb-dev \
+     && rm -rf /var/lib/apt/lists/*
+
+# Install rbenv and ruby-build
+RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv \
+    && git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build \
+    && ~/.rbenv/bin/rbenv install 3.0.2 \
+    && ~/.rbenv/bin/rbenv global 3.0.2
+
+RUN gem uninstall yajl-ruby
+RUN gem install yajl-ruby
+
+# Update PATH
+ENV PATH="/root/.rbenv/shims:/root/.rbenv/bin:${PATH}"
+
+# Install fluent-plugin-elasticsearch
+RUN gem install fluent-plugin-elasticsearch --no-document --version 5.3.0
+
+USER fluent
+```
+
+```
+docker compose up --build  --remove-orphans --force-recreate
+
+docker compose down --rmi local --remove-orphans -v
+
 ```
