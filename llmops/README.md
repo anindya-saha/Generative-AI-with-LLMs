@@ -52,3 +52,52 @@ project-root/
 --max-total-tokens 4096 \
 --max-batch-prefill-tokens 4096
 ```
+
+### Test the Huggingface TGI Server from the command line
+curl localhost:8080/generate \
+    -X POST \
+    -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":20}}' \
+    -H 'Content-Type: application/json'
+
+### Test the Huggingface TGI Server from inside the Fast API container
+```
+docker ps | grep fastapi
+
+docker exec -it <fastapi_container_id> /bin/bash
+
+docker exec -it $(docker ps | grep 'fastapi' | awk '{print $1}') /bin/bash
+```
+```
+curl http://tgi:80/generate \
+    -X POST \
+    -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":20}}' \
+    -H 'Content-Type: application/json'
+```
+
+### Test the Fast API from local terminal
+curl -X 'POST' \
+  'http://localhost:8000/generate-text/' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{"prompt": "What is Machine Learning?"}'
+
+<label @FLUENT_LOG>
+  <match *.**>
+    @type copy
+    <store>
+      @type elasticsearch
+      host elasticsearch
+      port 9200
+      logstash_format true
+      logstash_prefix fluentd
+      logstash_dateformat %Y%m%d
+      include_tag_key true
+      type_name access_log
+      tag_key @log_name
+      flush_interval 1s
+    </store>
+    <store>
+      @type stdout
+    </store>
+  </match>
+</label>

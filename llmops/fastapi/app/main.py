@@ -1,37 +1,43 @@
-import requests
+import os
+from typing import Any, Dict
+
+import httpx
 from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
 app = FastAPI()
 
-# Hugging Face Inference API URL for your model
-HF_API_URL = "https://api-inference.huggingface.co/models/YOUR_MODEL_NAME"
-# Replace YOUR_HF_API_KEY with your actual Hugging Face API key
-headers = {"Authorization": f"Bearer YOUR_HF_API_KEY"}
+# Load configuration from environment variables
+HF_API_URL = os.getenv("HF_API_URL")
+HF_API_KEY = os.getenv("HF_API_KEY")
+
+headers = {"Authorization": f"Bearer {HF_API_KEY}"}
 
 
-def call_hf_inference_api(prompt: str):
+class TextPrompt(BaseModel):
+    prompt: str
+
+
+async def call_hf_inference_api(prompt: str) -> Dict[str, Any]:
     payload = {"inputs": prompt}
-    response = requests.post(HF_API_URL, headers=headers, json=payload)
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{HF_API_URL}/generate", headers=headers, json=payload
+        )
     if response.status_code == 200:
         return response.json()
     else:
         raise HTTPException(
             status_code=response.status_code,
-            detail="Error calling Hugging Face Inference API",
+            detail=f"Error calling Hugging Face Inference API: {response.text}",
         )
 
 
-@app.post("/generate-text/")
-async def generate_text(prompt: str):
-    # Pre-processing (if needed)
-    preprocessed_prompt = prompt  # Placeholder for actual pre-processing logic
-
-    # Call Hugging Face Inference API
-    hf_response = call_hf_inference_api(preprocessed_prompt)
-
-    # Post-processing (if needed)
-    generated_text = hf_response[0][
+@app.post("/generate-text/", response_model=Dict[str, Any])
+async def generate_text(prompt: TextPrompt) -> Dict[str, Any]:
+    preprocessed_prompt = prompt.prompt  # Placeholder for actual pre-processing logic
+    hf_response = await call_hf_inference_api(preprocessed_prompt)
+    generated_text = hf_response[
         "generated_text"
-    ]  # Placeholder for actual post-processing logic
-
+    ]  # call_hf_inference_api returns a json response with the generated text
     return {"generated_text": generated_text}

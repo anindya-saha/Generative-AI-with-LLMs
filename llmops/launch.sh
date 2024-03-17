@@ -82,9 +82,12 @@ INFERENCE_COMMAND="--model-id ${MODEL} \
 --max-concurrent-requests ${MAX_CONCURRENT_REQUESTS} \
 --max-input-length ${MAX_INPUT_LENGTH} \
 --max-total-tokens ${MAX_TOTAL_TOKENS} \
---max-batch-prefill-tokens ${MAX_BATCH_PREFILL_TOKENS} \
 --max-stop-sequences 20 \
 --trust-remote-code"
+
+if [[ -n "${MAX_BATCH_PREFILL_TOKENS}" ]]; then
+    INFERENCE_COMMAND+=" --max-batch-prefill-tokens ${MAX_BATCH_PREFILL_TOKENS}"
+fi
 
 # Append quantize option if it's set
 if [[ -n "${QUANTIZE}" ]]; then
