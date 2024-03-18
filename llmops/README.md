@@ -56,6 +56,7 @@ docker ps | grep fastapi
 
 docker exec -it <fastapi_container_id> /bin/bash
 
+docker exec -it $(docker ps | grep 'fluentd' | awk '{print $1}') /bin/bash
 docker exec -it $(docker ps | grep 'fastapi' | awk '{print $1}') /bin/bash
 ```
 
