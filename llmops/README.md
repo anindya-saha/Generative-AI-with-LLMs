@@ -114,4 +114,6 @@ docker compose up -d --build --remove-orphans --force-recreate
 
 docker compose down --rmi local --remove-orphans -v
 
+docker compose logs fluentd
+
 ```
