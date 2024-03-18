@@ -57,6 +57,10 @@ services:
     environment:
       - discovery.type=single-node
       - network.host=0.0.0.0
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms128m -Xmx512m"
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
     expose:
@@ -64,11 +68,16 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.13.1
+    environment:
+      ELASTICSEARCH_URL: "http://elasticsearch:9200"
     depends_on:
       - elasticsearch
     ports:
       - "5601:5601"
 
+volumes:
+  esdata1:
+    driver: local
   # grafana:
   #   image: ghcr.io/grafana/grafana
   #   ports:
