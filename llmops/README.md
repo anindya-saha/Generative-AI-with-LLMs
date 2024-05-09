@@ -83,7 +83,7 @@ docker exec -it $(docker ps | grep 'fastapi' | awk '{print $1}') /bin/bash
 ```
 
 ```bash
-# Indie the Fast API container, test text generation from TGI server 
+# Inside the Fast API container, test text generation from TGI server 
 curl -X 'POST' \
   'http://tgi:80/generate' \
   -H 'accept: application/json' \
