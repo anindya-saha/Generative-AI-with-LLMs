@@ -1,4 +1,11 @@
-Use an end-to-end model hosting solution to host code llama. Fast API for custom preprocessing and post processing + HF TGI (Text Generation Inference) server to host the model + Capture FAST API logs, HF TGI logs through Fluentd to ElasticSearch and visualize in Grafana, Capture Fast API metrics and TGI metrics in Prometheus + Grafana to visualize, Load test using Locust. - Everything locally via Docker compose.
+## Use an end-to-end model hosting solution to host code llama. 
++ Fast API for custom preprocessing and post processing
++ HF TGI (Text Generation Inference) server to host the model
++ Capture FAST API logs, HF TGI logs through Fluentd to ElasticSearch and visualize in Grafana
++ Capture Fast API metrics and TGI metrics in Prometheus + Grafana to visualize
++ Load test using Locust.
+
+ Everything locally via Docker compose.
 
 ```bash
 project-root/
@@ -42,39 +49,67 @@ project-root/
     ├── locustfile.py  # Locust test scripts
     └── requirements.txt
 ```
+### Bring up all the components using CLI
+
+```bash
+docker compose up -d --build --remove-orphans --force-recreate
+
+docker compose down --rmi local --remove-orphans -v
+
+docker compose logs fluentd
+```
 
 ### Test the Huggingface TGI Server from the command line
-```
+
+```bash
+# Test model generation
 curl localhost:8080/generate \
     -X POST \
     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":20}}' \
     -H 'Content-Type: application/json'
 ```
-### Test the Huggingface TGI Server from inside the Fast API container
+
+```bash
+# Test TGI server metrics emitted
+curl localhost:8080/metrics
 ```
-docker ps | grep fastapi
 
-docker exec -it <fastapi_container_id> /bin/bash
+### Test the Huggingface TGI Server from inside the Fast API container
 
+```bash
 docker exec -it $(docker ps | grep 'fluentd' | awk '{print $1}') /bin/bash
 docker exec -it $(docker ps | grep 'fastapi' | awk '{print $1}') /bin/bash
 ```
 
-```
-curl http://tgi:80/generate \
+```bash
+# Test model generation from within the Fast API container
+curl http://tgi-server:80/generate \
     -X POST \
     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":20}}' \
     -H 'Content-Type: application/json'
 ```
 
 ### Test the Fast API from local terminal
-```
+
+```bash
 curl -X 'POST' \
   'http://localhost:8000/generate-text/' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{"prompt": "What is Machine Learning?"}'
 ```
+### Test Grafana from local terminal
+
+Open up the Grafana dashboard at:
+http://<machine_public_ip>:3000
+
+username: admin  
+password: admin  
+
+Add a Prometheus data source. We have a default ./grafana/provisioning/datasources/datasource.yml for a local Prometheus instance.
+
+[not Working]: Import the Huggingface TGI Server dashboard from https://grafana.com/grafana/dashboards/19831-text-generation-inference-dashboard/
+
 
 
 ```bash
@@ -107,14 +142,4 @@ curl -X 'POST' \
     </store>
   </match>
 </label>
-```
-
-
-```
-docker compose up -d --build --remove-orphans --force-recreate
-
-docker compose down --rmi local --remove-orphans -v
-
-docker compose logs fluentd
-
 ```

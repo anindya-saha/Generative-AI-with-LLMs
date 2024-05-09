@@ -2,23 +2,41 @@ version: '3.8'
 
 services:
 
-  fastapi:
-    build: ./fastapi
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.1
     environment:
-      - HF_API_URL=http://tgi:80  # Use this if FastAPI and TGI are in the same Docker network
+      - discovery.type=single-node
+      - network.host=0.0.0.0
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms128m -Xmx512m"
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
     ports:
-      - "8000:8000"
+      - "9200:9200"
+    expose:
+      - "9200"
+
+  fluentd:
+    build: ./fluentd
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
     depends_on:
-      - tgi
-      - fluentd
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: localhost:24224
-        tag: fastapi.service
+      - elasticsearch
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+      
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.13.1
+    environment:
+      ELASTICSEARCH_URL: "http://elasticsearch:9200"
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
   
-  tgi:
-    image: ghcr.io/huggingface/text-generation-inference:1.4
+  tgi-server:
+    image: ghcr.io/huggingface/text-generation-inference:2.0.2
     command: ["--model-id", "HuggingFaceH4/zephyr-7b-beta"]
     shm_size: 1g
     env_file:
@@ -34,6 +52,8 @@ services:
       options:
         fluentd-address: localhost:24224
         tag: tgi.service
+    networks:
+      - monitoring
     deploy:
       resources:
         reservations:
@@ -42,55 +62,48 @@ services:
               count: all
               capabilities: [gpu]
 
-  fluentd:
-    build: ./fluentd
-    volumes:
-      - ./fluentd/conf:/fluentd/etc
-    depends_on:
-      - elasticsearch
-    ports:
-      - "24224:24224"
-      - "24224:24224/udp"
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.1
+  fastapi:
+    build: ./fastapi
     environment:
-      - discovery.type=single-node
-      - network.host=0.0.0.0
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms128m -Xmx512m"
-    volumes:
-      - esdata1:/usr/share/elasticsearch/data
+      - HF_API_URL=http://tgi-server:80  # Use this if FastAPI and TGI are in the same Docker network
     ports:
-      - "9200:9200"
-    expose:
-      - "9200"
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.13.1
-    environment:
-      ELASTICSEARCH_URL: "http://elasticsearch:9200"
+      - "8000:8000"
     depends_on:
-      - elasticsearch
+      - tgi-server
+      - fluentd
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: fastapi.service
+    networks:
+      - monitoring
+
+
+  prometheus:
+    image: prom/prometheus:v2.29.1
+    volumes:
+      - ./prometheus:/etc/prometheus
     ports:
-      - "5601:5601"
+      - "9090:9090"
+    depends_on:
+      - tgi-server
+    networks:
+      - monitoring
 
-  # grafana:
-  #   image: ghcr.io/grafana/grafana
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - elasticsearch
 
-  # prometheus:
-  #   image: ghcr.io/prom/prometheus
-  #   volumes:
-  #     - ./prometheus:/etc/prometheus
-  #   ports:
-  #     - "9090:9090"
-  #   depends_on:
-  #     - fastapi
-  #     - tgi
+  grafana:
+    image: grafana/grafana:8.1.2
+    ports:
+      - "3000:3000"
+      - "3000:3000"    
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+
 
   # locust:
   #   image: locustio/locust
@@ -99,6 +112,9 @@ services:
   #   ports:
   #     - "8089:8089"
   #   command: -f /mnt/locust/locustfile.py --host=http://fastapi:8000
+
+networks:
+  monitoring:
 
 volumes:
   esdata1:
