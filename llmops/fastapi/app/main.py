@@ -5,6 +5,7 @@ from typing import Any, Dict
 
 import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request
+from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 
 # Set up basic configuration for logging
@@ -64,3 +65,8 @@ async def generate_text(
     logger.info(f"Request ID {request_id}: Generated text: {generated_text}")
     response = {"generated_text": generated_text, "request_id": request_id}
     return response
+
+
+# Instrument the FastAPI app with Prometheus metrics
+instrumentator = Instrumentator()
+instrumentator.instrument(app).expose(app)

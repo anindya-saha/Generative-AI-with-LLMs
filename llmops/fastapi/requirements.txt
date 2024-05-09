@@ -1,4 +1,5 @@
-fastapi==0.75.0
-uvicorn==0.17.6
-requests==2.27.1
-httpx==0.21.1
+fastapi==0.111.0
+uvicorn==0.29.0
+requests==2.31.0
+httpx==0.27.0
+prometheus-fastapi-instrumentator==7.0.0

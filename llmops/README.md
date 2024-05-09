@@ -110,6 +110,9 @@ Add a Prometheus data source. We have a default ./grafana/provisioning/datasourc
 
 [not Working]: Import the Huggingface TGI Server dashboard from https://grafana.com/grafana/dashboards/19831-text-generation-inference-dashboard/
 
+Read this Tutorial for Prometheus + Grafana + Fast API
+https://dev.to/ken_mwaura1/getting-started-monitoring-a-fastapi-app-with-grafana-and-prometheus-a-step-by-step-guide-3fbn
+
 
 
 ```bash
