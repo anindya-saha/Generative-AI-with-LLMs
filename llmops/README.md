@@ -62,7 +62,7 @@ docker compose logs fluentd
 ### Test the Huggingface TGI Server from the command line
 
 ```bash
-# Test model generation
+# Test text generation
 curl localhost:8080/generate \
     -X POST \
     -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":20}}' \
@@ -74,26 +74,30 @@ curl localhost:8080/generate \
 curl localhost:8080/metrics
 ```
 
-### Test the Huggingface TGI Server from inside the Fast API container
+### Test the Huggingface TGI Server from within the Fast API container
 
 ```bash
 docker exec -it $(docker ps | grep 'fluentd' | awk '{print $1}') /bin/bash
+
 docker exec -it $(docker ps | grep 'fastapi' | awk '{print $1}') /bin/bash
 ```
 
 ```bash
-# Test model generation from within the Fast API container
-curl http://tgi-server:80/generate \
-    -X POST \
-    -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":20}}' \
-    -H 'Content-Type: application/json'
+# Indie the Fast API container, test text generation from TGI server 
+curl -X 'POST' \
+  'http://tgi:80/generate' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{"inputs":"What is Deep Learning?","parameters":{"max_new_tokens":256}}'
 ```
 
-### Test the Fast API from local terminal
+### Test the Fast API from the local mac/linux/windows terminal
+
+Note: The port used is `8000` instead of `8080`. We use `8000` while calling `fastapi` but use `8080` when calling TGI. Also, the url is different, its `/generate-text` while usinf fastapi instead of `/generate` when using TGI.
 
 ```bash
 curl -X 'POST' \
-  'http://localhost:8000/generate-text/' \
+  'http://localhost:8000/generate-text' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{"prompt": "What is Machine Learning?"}'

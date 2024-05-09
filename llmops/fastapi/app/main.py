@@ -50,7 +50,7 @@ async def call_hf_inference_api(prompt: str, request_id: str) -> Dict[str, Any]:
         )
 
 
-@app.post("/generate-text/", response_model=Dict[str, Any])
+@app.post("/generate-text", response_model=Dict[str, Any])
 async def generate_text(
     prompt: TextPrompt, request: Request, request_id: str = Depends(generate_uuid)
 ) -> Dict[str, Any]:
