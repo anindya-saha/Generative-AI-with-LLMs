@@ -115,7 +115,7 @@ if [ -f ${ENV_FILE} ]; then
 fi
 
 echo "Creating ${ENV_FILE} file"
-echo "INFERENCE_COMMAND=${INFERENCE_COMMAND}" >> ${ENV_FILE}
+echo "INFERENCE_COMMAND=\"${INFERENCE_COMMAND}\"" >> ${ENV_FILE}
 echo "VOLUME=${DOCKER_VOLUME_DIRECTORY}/llmops/data" >> ${ENV_FILE}
 echo "PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:64" >> ".env"
 
