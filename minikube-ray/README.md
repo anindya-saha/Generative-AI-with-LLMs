@@ -1,3 +1,6 @@
+python3.10 -m venv minikube-ray
+source minikube-ray/bin/activate
+
 pip3 install --upgrade pip
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 pip3 install "torchmetrics>=0.9" "pytorch_lightning>=1.6" 
