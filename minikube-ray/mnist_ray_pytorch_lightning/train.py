@@ -1,6 +1,7 @@
 # Train a Pytorch Lightning Image Classifier
 # https://docs.ray.io/en/latest/train/examples/lightning/lightning_mnist_example.html
 import os
+import ray
 import numpy as np
 import random
 import torch
@@ -136,7 +137,7 @@ def train_func_per_worker():
         strategy=RayDDPStrategy(),
         plugins=[RayLightningEnvironment()],
         callbacks=[RayTrainReportCallback()],
-        max_epochs=10,
+        max_epochs=30,
         accelerator="gpu" if use_gpu else "cpu",
         log_every_n_steps=100,
         logger=CSVLogger("logs"),
@@ -185,3 +186,5 @@ with checkpoint.as_directory() as ckpt_dir:
     best_model = MNISTClassifier.load_from_checkpoint(f"{ckpt_dir}/checkpoint.ckpt")
 
 print(best_model)
+
+ray.shutdown()
