@@ -38,13 +38,15 @@ kubectl create -f cuda-test-pod.yaml
 
 Check the status of the pod.
 ```bash
-kubectl describe pod cuda-vector-add or kubectl get pod cuda-vector-add -o yaml
+kubectl describe pod cuda-vector-add
+or 
+kubectl get pod cuda-vector-add -o yaml
 
 $ kubectl get pod cuda-vector-add
 NAME              READY   STATUS    RESTARTS   AGE
 cuda-vector-add   1/1     Running   0          23s
 
-kubectl logs -f cuda-vector-ad
+kubectl logs -f cuda-vector-add
 
 You should see the following lines in the log
 cp vectorAdd ../../bin/x86_64/linux/release
@@ -56,7 +58,7 @@ Test PASSED
 Done
 ```
 
-The status shoudl be `Running`. If it fails with cannot provision pos due to Gpu unavailibility then you might have to restart the m/c. IN GCP you need to just Reset the m/c.
+The status should be `Running`. If it fails with cannot provision pos due to Gpu unavailibility then you might have to restart the m/c. In GCP you need to just Reset the m/c.
 
 
 ### Stop the cluster
