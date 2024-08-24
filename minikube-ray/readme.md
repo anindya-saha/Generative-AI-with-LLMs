@@ -16,13 +16,19 @@ Follow the steps in https://minikube.sigs.k8s.io/docs/tutorials/nvidia/ to add t
 ### Provision the minikube cluster
 ```bash
 # start with 32 cpus and 80gb of memory
-minikube start --driver docker --container-runtime docker --gpus all --nodes 2 --memory 81920 --cpus 32
+minikube start --driver docker --container-runtime docker --gpus all --memory 81920 --cpus 32
+```
+
+### Getting just the dashboard URL
+If you don’t want to open a web browser, the dashboard command can also simply emit a URL:
+```bash
+minikube dashboard --url
 ```
 
 ## Install Kubectl
-If you do not have `kubectl`, then minikube can download the appropriate version of kubectl.
+Follow the steps in https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/ to install `kubectl`.
 ```bash
-minikube kubectl -- get pods -A
+kubectl -- get pods -A
 ```
 
 You can check the resources of the running Minikube instance, using the kubectl:
@@ -31,7 +37,7 @@ kubectl get node minikube -o jsonpath='{.status.capacity}'
 ```
 
 ### Test GPU support
-Apply the test yaml to verify GPU support.
+Apply the tes yaml to verify GPU support.
 ```bash
 kubectl create -f cuda-test-pod.yaml
 ```
