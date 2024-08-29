@@ -82,6 +82,57 @@ minikube delete
 Helm is the package manager for Kubernetes.
 
 Follow steps from https://helm.sh/docs/intro/install/ to install Helm.
+```
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+$ chmod 700 get_helm.sh
+$ ./get_helm.sh
+```
+
+## Deploy Kuberay
+https://ray-project.github.io/kuberay/deploy/helm/
+
+
+docker build -t dockerhub.docker.zooxlabs.com/ray-sample:2.0.0 .
+
+docker push dockerhub.docker.zooxlabs.com/ray-sample:2.0.0
+
+
+kubectl create -f ray-job.sample.yaml 
+
+```bash
+# Step 4.1: List all RayJob custom resources in the `default` namespace.
+kubectl get rayjob
+
+# [Example output]
+# NAME            JOB STATUS   DEPLOYMENT STATUS   START TIME             END TIME   AGE
+# rayjob-sample                Running             2024-03-02T19:09:15Z              96s
+
+# Step 4.2: List all RayCluster custom resources in the `default` namespace.
+kubectl get raycluster
+
+# [Example output]
+# NAME                             DESIRED WORKERS   AVAILABLE WORKERS   CPUS   MEMORY   GPUS   STATUS   AGE
+# rayjob-sample-raycluster-tlsxc   1                 1                   400m   0        0      ready    91m
+
+# Step 4.3: List all Pods in the `default` namespace.
+# The Pod created by the Kubernetes Job will be terminated after the Kubernetes Job finishes.
+kubectl get pods
+
+# [Example output]
+# kuberay-operator-7456c6b69b-rzv25                         1/1     Running     0          3m57s
+# rayjob-sample-lk9jx                                       0/1     Completed   0          2m49s => Pod created by a Kubernetes Job
+# rayjob-sample-raycluster-9c546-head-gdxkg                 1/1     Running     0          3m46s
+# rayjob-sample-raycluster-9c546-worker-small-group-nfbxm   1/1     Running     0          3m46s
+
+# Step 4.4: Check the status of the RayJob.
+# The field `jobStatus` in the RayJob custom resource will be updated to `SUCCEEDED` and `jobDeploymentStatus`
+# should be `Complete` once the job finishes.
+kubectl get rayjobs.ray.io rayjob-sample -o jsonpath='{.status.jobStatus}'
+# [Expected output]: "SUCCEEDED"
+
+kubectl get rayjobs.ray.io rayjob-sample -o jsonpath='{.status.jobDeploymentStatus}'
+# [Expected output]: "Complete"
+```
 
 ## Install HuggingFace Helm Chart
 https://huggingface.co/blog/voatsap/tgi-kubernetes-cluster-dev

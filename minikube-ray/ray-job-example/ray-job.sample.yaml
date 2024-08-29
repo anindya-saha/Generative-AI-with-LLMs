@@ -45,7 +45,7 @@ spec:
         spec:
           containers:
             - name: ray-head
-              image: asaha/ray-sample:2.0.0
+              image: dockerhub.docker.zooxlabs.com/ray-sample:2.0.0
               ports:
                 - containerPort: 6379
                   name: gcs-server
@@ -74,7 +74,7 @@ spec:
           spec:
             containers:
               - name: ray-worker # must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc'
-                image: asaha/ray-sample:2.0.0
+                image: dockerhub.docker.zooxlabs.com/ray-sample:2.0.0
                 lifecycle:
                   preStop:
                     exec:

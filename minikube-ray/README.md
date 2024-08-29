@@ -10,4 +10,4 @@ pip3 install numpy scikit-learn scipy datasets "torchmetrics>=0.9" "transformers
 pip3 install -U "ray[default,data,train,tune,serve]==2.34.0"
 
 
-ssh -L -N 8265:localhost:8265 user@remote-host
+ssh -L 8265:localhost:8265 -N user@remote-host
