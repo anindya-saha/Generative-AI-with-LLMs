@@ -28,7 +28,7 @@ minikube dashboard --url
 ## Install Kubectl
 Follow the steps in https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/ to install `kubectl`.
 ```bash
-kubectl -- get pods -A
+minikube kubectl -- get pods -A
 ```
 
 You can check the resources of the running Minikube instance, using the kubectl:
